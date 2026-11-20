@@ -1,1 +1,51 @@
+</DOCTYPE html>
+<html>
+  <head>
+    <title>Lywawa Bakery - login </title>
+    <style>
+      body {font-family: Arial; background: #FF8E7; margin: 0; text-align: center; }
+      .box { background: white; width: 300px; margin: 60px auto; padding: 25px; boeder-radius: 15px; }
+      h1 { color: #5C3317; }
+      input { width: 90%; padding: 10px; margin: 8px; border-radius: 8px; border: 1px solid #CCC; }
+      button {background: #D4A017; border: none; padding: 11px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+      button:hover { background: #B8860B; color: white; }
+      .demo {background: #FFFBEB; padding: 10px; border-radius: 8px; margin-top: 12px; font-size: 13px; color: #5C3317; }
+    </style>
+  </head>
+  <body>
+     <div class="box">
+       <div style="font-size:50px;🍞"></div>
+       <h1>Lywawa Bakery</h1>
+       <p> Management System - login</p>
 
+       <form onsubmit="login(even)")
+         <input type="text" id="username" placeholder="username" required>
+         <br>
+         <input type="password" id="password" placeholder="password" required>
+         <br><br>
+         <button type="submit">Login</button>
+       </form>
+
+       <div class="demo">
+         <b>Demo Login:</b><br>
+         Username: admin<br>
+         password: admin123
+       </div>
+     </div>
+
+    <script>
+      function login(e){
+        e.PreventDefault()
+        var u = document.getElementById('username').value;
+        var p = document.getElementById('password').value;
+        if(u === 'admin' && p === 'admin123'){
+          localStorage.seetItem('lywawa_user', u);
+          window.location.href = 'dashboard.html';
+        } else {
+          alert('wrong username or password. Try admin / admin123');
+        }
+      }
+    </script>
+    
+  </body>
+</html>
