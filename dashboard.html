@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lywawa Bakery - Dashboard</title>
+  <style>
+    body { font-family: Arial; background: #FFFBEB; margin: 0; }
+    .top { background: #5C3317; color: white; padding: 15px 20px; display: flex; justify-content: space-between; }
+    .top a { color: white; text-decoration: none; }
+    .wrap { padding: 20px; max-width: 900px; margin: auto; }
+    h2 { color: #5C3317; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+    .card { background: white; padding: 20px; border-radius: 15px; text-align: center; }
+    .card h3 { margin: 5px 0; color: #5C3317; }
+    .card p { color: #888; font-size: 14px; }
+    .card a { display: inline-block; margin-top: 10px; background: #D4A017; color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div class="top">
+    <b>Lywawa Bakery</b>
+    <span>Welcome, <span id="user"></span> | <a href="index.html">Logout</a></span>
+  </div>
+
+  <div class="wrap">
+    <h2>Dashboard</h2>
+    <p>Sales and Inventory Overview</p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Products</h3>
+        <p>Manage bread, cakes & pastries</p>
+        <a href="products.html">Open</a>
+      </div>
+      <div class="card">
+        <h3>Sales / POS</h3>
+        <p>Record daily sales</p>
+        <a href="sales.html">Open</a>
+      </div>
+      <div class="card">
+        <h3>Inventory</h3>
+        <p>Stock in, stock out & low stock</p>
+        <a href="inventory.html">Open</a>
+      </div>
+      <div class="card">
+        <h3>Orders</h3>
+        <p>Customer orders</p>
+        <a href="orders.html">Open</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+  document.getElementById('user').innerText = localStorage.getItem('lywawa_user') || 'Admin';
+</script>
+
+</body>
+</html>
