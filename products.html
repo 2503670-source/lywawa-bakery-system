@@ -1,60 +1,61 @@
 <!DOCTYPE html>
-<Html>
-  <head>
-    <title>Products - lywaw Bakery</title>
-    <style>
-      body{font-family:Arial;background:#FFF3E0;margin:0}
-      .top{background:#BF360C;color:white;padding:15px 20px;display:flex;justify-content:space-between}
-      .top a{color:white;text-decoration:none}
-      .wrap{padding:20px}
-      input, select{padding:10px;width:100%;margin:5px 0;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}
-      button{padding:12px;width:100%;background:#BF360C;color:white;border:none;border-radius:8px;font-size:16px}
-      table{width:100%;background:white;border-collapse:collapse;margin-top:15px;border-radius:10px;overflow:hidden}
-      th, td{padding:12px;text-align:left;border-bottom:1px solid #eee;font-size:14px}
-      th{background:#FFE0B2}
-      .del{color:red;cursor:pointer}
-    </style>
-  </head>
-  <body>
-    <div class="top"><b> Products</b><a href="dashboard.html">Back</a></div>
-    <div class="wrap">
-      <input id="name" placeholder="Product Name e.g. White Bread">
-      <input id="price" type="number" placeholder="Price Ksh">
-      <input id="stock" type="number" placeholder="Stock Qty">
-      <button onclick="add()">Add Product</button>
-
-      <table>
-        <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th></th></tr></thead>
-        <tbody id="list"></tbody>
-      </table>
-    </div>
-    <script>
-      let products=[
-        {name:"White Bread",price:80,stock:45},
-        {name:"Chocolate Cake",price:850,stock:12},
-        {name:"Cookies (3pcs)",price:50,stock:60},
-        {name:"Croissant",price:120,stock:20}
-        ];
-      function show() {
-        let h="";
-        products.forEach((p,i)=>{
-          h+='<tr><td>${p.name}</td><td>Ksh ${p.price}</td><td>${p.stock}</td><td class="del" onclick="del(${i})">Delete</td></tr>';
-        });
-         document.getElementById('list').innerHTML=h;
+<html>
+<head>
+<title>Products - Lywawa Bakery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;background:#FFF3E0;margin:0}
+.top{background:#BF360C;color:white;padding:15px 20px;display:flex;justify-content:space-between}
+.top a{color:white;text-decoration:none}
+.wrap{padding:20px}
+input{padding:12px;width:100%;margin:5px 0;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}
+button{padding:12px;width:100%;background:#BF360C;color:white;border:none;border-radius:8px;font-size:16px}
+table{width:100%;background:white;border-collapse:collapse;margin-top:15px;border-radius:10px;overflow:hidden}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #eee;font-size:14px}
+th{background:#FFE0B2}
+.del{color:red;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="top"><b>📦 Products</b><a href="dashboard.html">Back</a></div>
+<div class="wrap">
+<input id="name" placeholder="Product Name e.g. White Bread">
+<input id="price" type="number" placeholder="Price Ksh">
+<input id="stock" type="number" placeholder="Stock Qty">
+<button onclick="add()">Add Product</button>
+<table>
+<thead><tr><th>Product</th><th>Price</th><th>Stock</th><th></th></tr></thead>
+<tbody id="list"></tbody>
+</table>
+<p id="msg" style="text-align:center;color:green"></p>
+</div>
+<script>
+var products = JSON.parse(localStorage.getItem('lywawa_products') || 'null') || [
+{name:"White Bread",price:80,stock:45},
+{name:"Chocolate Cake",price:850,stock:12},
+{name:"Mandazi (3pcs)",price:50,stock:60},
+{name:"Croissant",price:120,stock:20}
+];
+function save(){ localStorage.setItem('lywawa_products', JSON.stringify(products)); }
+function show(){
+  var h="";
+  for(var i=0;i<products.length;i++){
+    var p=products[i];
+    h += "<tr><td>" + p.name + "</td><td>Ksh " + p.price + "</td><td>" + p.stock + "</td><td class='del' onclick='del(" + i + ")'>Delete</td></tr>";
+  }
+  document.getElementById('list').innerHTML=h;
 }
 function add(){
-  let n=document.getElementById('name').value;
-  let pr=document.getElementById('price').value;
-  let s=document.getElementById('stock').value;
-  if(n && pr){
-    products.push({name:n,price:pr,stock:s||0});
-    show();
-    document.getElementById('name').value="";
-    document.getElementById('price').value="";
-    document.getElementById('stock').value="";
-  }
+  var n=document.getElementById('name').value.trim();
+  var pr=document.getElementById('price').value;
+  var s=document.getElementById('stock').value;
+  if(!n || !pr){ document.getElementById('msg').innerText="Please fill Name and Price"; return; }
+  products.push({name:n,price:pr,stock:s||0});
+  save(); show();
+  document.getElementById('msg').innerText="Added: "+n;
+  document.getElementById('name').value="";document.getElementById('price').value="";document.getElementById('stock').value="";
 }
-function del(i){ products.splice(i,1); show(); }
+function del(i){ products.splice(i,1); save(); show(); }
 show();
 </script>
 </body>
