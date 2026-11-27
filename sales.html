@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sales POS - Lywawa Bakery</title>
+<style>
+body{font-family:Arial;background:#FFF3E0;margin:0}
+.top{background:#BF360C;color:white;padding:15px 20px;display:flex;justify-content:space-between}
+.top a{color:white;text-decoration:none}
+.wrap{padding:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{background:white;padding:15px;border-radius:10px;text-align:center;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.item b{display:block}
+.item span{color:#BF360C;font-weight:bold}
+.cart{background:white;padding:15px;border-radius:12px;margin-top:15px}
+.cart div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:14px}
+.total{font-size:20px;font-weight:bold;display:flex;justify-content:space-between;margin-top:10px}
+button{width:100%;padding:13px;margin-top:10px;border:none;border-radius:8px;font-size:16px;cursor:pointer}
+.pay{background:#2E7D32;color:white}
+.clear{background:#eee}
+select{width:100%;padding:10px;margin-top:10px;border-radius:8px;border:1px solid #ddd}
+</style>
+</head>
+<body>
+<div class="top"><b>🛒 Sales / POS</b><a href="dashboard.html">Back</a></div>
+<div class="wrap">
+<div class="grid" id="menu"></div>
+
+<div class="cart">
+<b>🧾 Receipt</b>
+<div id="cart"></div>
+<div class="total"><span>Total:</span><span id="total">Ksh 0</span></div>
+<select id="payMethod">
+<option>Cash</option>
+<option>M-Pesa</option>
+<option>Card</option>
+</select>
+<button class="pay" onclick="checkout()">Complete Sale</button>
+<button class="clear" onclick="clearCart()">Clear</button>
+<p id="msg" style="color:green;text-align:center"></p>
+</div>
+</div>
+<script>
+let menu=[
+{name:"White Bread",price:80},
+{name:"Brown Bread",price:90},
+{name:"Mandazi",price:50},
+{name:"Chocolate Cake",price:850},
+{name:"Croissant",price:120},
+{name:"Doughnut",price:70}
+];
+let cart=[];
+function showMenu(){
+  document.getElementById('menu').innerHTML=menu.map((m,i)=>
+  `<div class="item" onclick="add(${i})"><b>${m.name}</b><span>Ksh ${m.price}</span><br><small>+ Add</small></div>`
+  ).join("");
+}
+function add(i){
+  let found=cart.find(c=>c.name==menu[i].name);
+  if(found){found.qty++} else {cart.push({name:menu[i].name,price:menu[i].price,qty:1})}
+  showCart();
+}
+function showCart(){
+  let total=0;
+  document.getElementById('cart').innerHTML=cart.map(c=>{
+    let line=c.price*c.qty; total+=line;
+    return `<div><span>${c.name} x ${c.qty}</span><span>Ksh ${line}</span></div>`;
+  }).join("") || "<div>No items yet</div>";
+  document.getElementById('total').innerText="Ksh "+total;
+}
+function clearCart(){cart=[];showCart();document.getElementById('msg').innerText="";}
+function checkout(){
+  if(cart.length==0){alert("Cart is empty");return;}
+  let method=document.getElementById('payMethod').value;
+  let total=document.getElementById('total').innerText;
+  document.getElementById('msg').innerText="✅ Sale Complete - "+total+" via "+method;
+  cart=[];showCart();
+}
+showMenu();showCart();
+</script>
+</body>
+</html>
