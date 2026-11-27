@@ -2,57 +2,61 @@
 <html>
 <head>
 <title>Reports - Lywawa Bakery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{font-family:Arial;background:#FFF3E0;margin:0}
-.top{background:#BF360C;color:white;padding:15px 20px;display:flex;justify-content:space-between}
+body{font-family:Arial;margin:0;background-image:url('bakery1.jpg');background-size:cover;background-position:center;background-attachment:fixed}
+.top{background:rgba(191,54,12,0.95);color:white;padding:15px 20px;display:flex;justify-content:space-between}
 .top a{color:white;text-decoration:none}
 .wrap{padding:20px}
-.card{background:white;padding:18px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
-.bar{display:flex;align-items:flex-end;gap:10px;height:120px;margin-top:10px}
-.col{flex:1;background:#BF360C;color:white;text-align:center;border-radius:6px 6px 0 0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;font-size:12px}
-.label{display:flex;gap:10px;margin-top:5px}
-.label span{flex:1;text-align:center;font-size:12px;color:#666}
-table{width:100%;border-collapse:collapse;margin-top:10px}
-th,td{padding:10px;text-align:left;border-bottom:1px solid #eee;font-size:14px}
+.card{background:rgba(255,255,255,0.95);padding:20px;border-radius:15px;margin-bottom:15px;text-align:center;box-shadow:0 5px 15px rgba(0,0,0,0.2)}
+.big{font-size:30px;font-weight:bold}
+.green{color:green}.red{color:red}.orange{color:#BF360C}
+table{width:100%;background:white;border-collapse:collapse;border-radius:10px;overflow:hidden}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #eee;font-size:14px}
+th{background:#FFE0B2}
+button{padding:12px;width:100%;background:#BF360C;color:white;border:none;border-radius:8px;margin-top:10px}
 </style>
 </head>
 <body>
-<div class="top"><b>📊 Reports</b><a href="dashboard.html">Back</a></div>
+<div class="top"><b>📊 Profit & Loss</b><a href="dashboard.html">Back</a></div>
 <div class="wrap">
-
-<div class="card">
-<b>💰 Sales This Week</b>
-<div class="bar">
-<div class="col" style="height:40%">8k</div>
-<div class="col" style="height:60%">12k</div>
-<div class="col" style="height:50%">10k</div>
-<div class="col" style="height:85%">17k</div>
-<div class="col" style="height:70%">14k</div>
-<div class="col" style="height:100%">20k</div>
-<div class="col" style="height:65%">13k</div>
+<div class="card">Total Sales<div class="big orange" id="sales">Ksh 0</div></div>
+<div class="card">Total Cost<div class="big red" id="cost">Ksh 0</div></div>
+<div class="card">Profit / Loss<div class="big" id="profit">Ksh 0</div><p id="msg"></p></div>
+<table><thead><tr><th>Product</th><th>Qty Sold</th><th>Sales</th><th>Profit</th></tr></thead><tbody id="list"></tbody></table>
+<button onclick="clearAll()">Clear All Sales (New Day)</button>
 </div>
-<div class="label"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
-<p style="text-align:center"><b>Total: Ksh 94,000</b></p>
-</div>
-
-<div class="card">
-<b>🏆 Best Selling Products</b>
-<table>
-<tr><th>Product</th><th>Sold</th><th>Revenue</th></tr>
-<tr><td>White Bread</td><td>320</td><td>Ksh 25,600</td></tr>
-<tr><td>Mandazi</td><td>280</td><td>Ksh 14,000</td></tr>
-<tr><td>Chocolate Cake</td><td>18</td><td>Ksh 15,300</td></tr>
-<tr><td>Croissant</td><td>95</td><td>Ksh 11,400</td></tr>
-</table>
-</div>
-
-<div class="card">
-<b>📦 Stock Alert</b>
-<p>⚠️ Flour - Only 5kg left</p>
-<p>⚠️ Sugar - Only 3kg left</p>
-<p>⚠️ Butter - Only 2kg left</p>
-</div>
-
-</div>
+<script>
+var orders = JSON.parse(localStorage.getItem('lywawa_orders') || '[]');
+var products = JSON.parse(localStorage.getItem('lywawa_products') || '[]');
+var totalSales=0, totalCost=0;
+var byProduct={};
+for(var i=0;i<orders.length;i++){
+  var o=orders[i];
+  // Find cost of this product, if no cost saved, assume 60% of price is cost
+  var prod = null;
+  for(var j=0;j<products.length;j++){ if(products[j].name==o.product){ prod=products[j]; break; } }
+  var price = Number(o.price) || 0;
+  var qty = Number(o.qty) || 1;
+  var costEach = prod && prod.cost ? Number(prod.cost) : price*0.6;
+  var sale = price*qty;
+  var cost = costEach*qty;
+  totalSales+=sale; totalCost+=cost;
+  if(!byProduct[o.product]) byProduct[o.product]={qty:0,sales:0,profit:0};
+  byProduct[o.product].qty+=qty; byProduct[o.product].sales+=sale; byProduct[o.product].profit+=(sale-cost);
+}
+document.getElementById('sales').innerText="Ksh "+totalSales;
+document.getElementById('cost').innerText="Ksh "+Math.round(totalCost);
+var profit = totalSales-totalCost;
+var pEl=document.getElementById('profit');
+pEl.innerText=(profit>=0?"Ksh ":"- Ksh ")+Math.abs(Math.round(profit));
+pEl.className="big "+(profit>=0?"green":"red");
+document.getElementById('msg').innerText= profit>=0 ? "✅ You are making profit!" : "❌ You are making a loss!";
+var h="";
+for(var k in byProduct){ var b=byProduct[k]; h+="<tr><td>"+k+"</td><td>"+b.qty+"</td><td>Ksh "+b.sales+"</td><td style='color:"+(b.profit>=0?"green":"red")+"'>Ksh "+Math.round(b.profit)+"</td></tr>"; }
+if(!h) h="<tr><td colspan='4' style='text-align:center'>No sales yet. Go to Sales page and make a sale.</td></tr>";
+document.getElementById('list').innerHTML=h;
+function clearAll(){ if(confirm("Clear all sales?")){ localStorage.setItem('lywawa_orders','[]'); location.reload(); } }
+</script>
 </body>
 </html>
