@@ -1,51 +1,40 @@
-</DOCTYPE html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Lywawa Bakery - login </title>
-    <style>
-      body {font-family: Arial; background: #FF8E7; margin: 0; text-align: center; }
-      .box { background: white; width: 300px; margin: 60px auto; padding: 25px; boeder-radius: 15px; }
-      h1 { color: #5C3317; }
-      input { width: 90%; padding: 10px; margin: 8px; border-radius: 8px; border: 1px solid #CCC; }
-      button {background: #D4A017; border: none; padding: 11px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-      button:hover { background: #B8860B; color: white; }
-      .demo {background: #FFFBEB; padding: 10px; border-radius: 8px; margin-top: 12px; font-size: 13px; color: #5C3317; }
-    </style>
-  </head>
-  <body>
-     <div class="box">
-       <div style="font-size:50px;🍞"></div>
-       <h1>Lywawa Bakery</h1>
-       <p> Management System - login</p>
-
-       <form onsubmit="login(even)")
-         <input type="text" id="username" placeholder="username" required>
-         <br>
-         <input type="password" id="password" placeholder="password" required>
-         <br><br>
-         <button type="submit">Login</button>
-       </form>
-
-       <div class="demo">
-         <b>Demo Login:</b><br>
-         Username: admin<br>
-         password: admin123
-       </div>
-     </div>
-
-    <script>
-      function login(e){
-        e.PreventDefault()
-        var u = document.getElementById('username').value;
-        var p = document.getElementById('password').value;
-        if(u === 'admin' && p === 'admin123'){
-          localStorage.seetItem('lywawa_user', u);
-          window.location.href = 'dashboard.html';
-        } else {
-          alert('wrong username or password. Try admin / admin123');
-        }
-      }
-    </script>
-    
-  </body>
+<head>
+<title>Lywawa Bakery - Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;background:#FFF3E0;margin:0;display:flex;justify-content:center;align-items:center;height:100vh}
+.box{background:white;padding:30px;border-radius:15px;width:320px;text-align:center;box-shadow:0 5px 15px rgba(0,0,0,0.1)}
+.logo{font-size:50px}
+h2{color:#BF360C;margin:5px 0}
+p{color:#666;font-size:14px}
+input{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;font-size:16px}
+button{width:100%;padding:13px;background:#BF360C;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer}
+.demo{background:#FFF3E0;padding:10px;border-radius:8px;margin-top:15px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="box">
+<div class="logo">🍞</div>
+<h2>Lywawa Bakery</h2>
+<p>Management System</p>
+<input id="user" placeholder="Username" value="admin">
+<input id="pass" type="password" placeholder="Password" value="admin123">
+<button onclick="login()">Login</button>
+<div class="demo">Demo Login<br><b>Username: admin<br>Password: admin123</b></div>
+<p id="err" style="color:red"></p>
+</div>
+<script>
+function login(){
+  let u=document.getElementById('user').value.trim();
+  let p=document.getElementById('pass').value.trim();
+  if(u=="admin" && p=="admin123"){
+    window.location.href="dashboard.html";
+  } else {
+    document.getElementById('err').innerText="Wrong! Use admin / admin123";
+  }
+}
+</script>
+</body>
 </html>
