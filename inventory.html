@@ -42,7 +42,7 @@ function show(){
   for(var i=0;i<products.length;i++){
     var p=products[i];
     var stock = p.stock<=5 ? "<span class='low'>"+p.stock+" LOW! ⚠️</span>" : p.stock;
-    h+="<tr><td>"+p.name+"</td><td>Ksh "+p.price+"</td><td>"+stock+"</td><td><span class='del' onclick='del("+i+")'>Delete</span></td></tr>";
+    h+="<tr><td>"+p.name+"</td><td>Ksh "+p.price+"</td><td>"+stock+"</td><td><span style='color:green;cursor:pointer;font-weight:bold' onclick='restock("+i+")'>+ Restock</span> | <span class='del' onclick='del("+i+")'>Delete</span></td></tr>";
   }
   document.getElementById('list').innerHTML=h;
 }
@@ -55,7 +55,15 @@ function addProduct(){
   save(); show();
   document.getElementById('name').value=""; document.getElementById('price').value=""; document.getElementById('stock').value="";
 }
-function del(i){ if(confirm("Delete "+products[i].name+"?")){ products.splice(i,1); save(); show(); } }
+function restock(i){
+  var add = prompt("How many "+products[i].name+" do you want to add? Current stock: "+products[i].stock);
+  if(add==null || add=="") return;
+  add = Number(add);
+  if(isNaN(add) || add<=0){ alert("Enter a valid number"); return; }
+  products[i].stock = Number(products[i].stock) + add;
+  save(); show();
+  alert("✅ Restocked! New stock for "+products[i].name+" is "+products[i].stock);
+}
 save(); show();
 </script>
 </body>
