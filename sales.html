@@ -1,101 +1,110 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>New Sale - Lywawa Bakery</title>
+<title>Sales POS - Lywawa Bakery</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{font-family:Arial;margin:0;background-image:url('bakery1.jpg');background-size:cover;background-position:center;background-attachment:fixed}
-.top{background:rgba(191,54,12,0.95);color:white;padding:15px 20px;display:flex;justify-content:space-between}
+.top{background:#BF360C;color:white;padding:15px 20px;display:flex;justify-content:space-between}
 .top a{color:white;text-decoration:none}
-.wrap{padding:20px}
-select,input{padding:12px;width:100%;margin:5px 0;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;font-size:16px}
-button{padding:13px;width:100%;background:#BF360C;color:white;border:none;border-radius:8px;font-size:16px}
-.card{background:rgba(255,255,255,0.95);padding:15px;border-radius:15px;margin-bottom:10px}
+.wrap{padding:15px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pcard{background:white;padding:15px;border-radius:10px;text-align:center;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.pcard b{font-size:14px}
+.price{color:#BF360C;font-size:13px}
+.stock{font-size:12px;color:#666}
 .low{color:red;font-weight:bold}
-.ok{color:green}
-table{width:100%;background:white;border-collapse:collapse;border-radius:10px;overflow:hidden;margin-top:15px}
-th,td{padding:10px;text-align:left;border-bottom:1px solid #eee;font-size:14px}
-th{background:#FFE0B2}
+.receipt{background:white;padding:15px;border-radius:10px;margin-top:15px}
+.row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #eee;font-size:14px}
+select{width:100%;padding:12px;margin:10px 0;border:1px solid #ddd;border-radius:8px}
+.btn{width:100%;padding:13px;border:none;border-radius:8px;font-size:16px;cursor:pointer;margin-top:5px}
+.green{background:#2E7D32;color:white}
+.grey{background:#eee}
 </style>
 </head>
 <body>
-<div class="top"><b>💰 New Sale</b><a href="dashboard.html">Back</a></div>
+<div class="top"><b>🧾 Sales / POS</b><a href="dashboard.html">Back</a></div>
 <div class="wrap">
-<div class="card">
-<label>Select Product</label>
-<select id="product" onchange="updateInfo()"></select>
-<p id="info"></p>
-<label>Quantity</label>
-<input id="qty" type="number" value="1" min="1">
-<label>Customer Name (optional)</label>
-<input id="customer" placeholder="e.g. Mary">
-<button onclick="makeSale()">Complete Sale ✅</button>
+<div class="grid" id="products"></div>
+<div class="receipt">
+<b>🧾 Receipt</b>
+<div id="cart"><p>No items yet</p></div>
+<div class="row"><b>Total:</b><b id="total">Ksh 0</b></div>
+<select id="payment"><option>Cash</option><option>M-Pesa</option><option>Card</option></select>
+<button class="btn green" onclick="completeSale()">Complete Sale</button>
+<button class="btn grey" onclick="clearCart()">Clear</button>
 <p id="msg" style="text-align:center;font-weight:bold"></p>
 </div>
-<div class="card"><b>Today's Sales</b><table><thead><tr><th>Product</th><th>Qty</th><th>Total</th></tr></thead><tbody id="today"></tbody></table></div>
 </div>
 <script>
-var products = JSON.parse(localStorage.getItem('lywawa_products') || '[]');
+var products = JSON.parse(localStorage.getItem('lywawa_products') || 'null') || [
+{name:"White Bread",price:80,cost:50,stock:45},
+{name:"Chocolate Cake",price:850,cost:500,stock:12},
+{name:"Mandazi (3pcs)",price:50,cost:20,stock:60},
+{name:"Croissant",price:120,cost:70,stock:20},
+{name:"brown bread",price:80,cost:50,stock:6},
+{name:"Soft drinks",price:100,cost:60,stock:10}
+];
 var orders = JSON.parse(localStorage.getItem('lywawa_orders') || '[]');
+var cart = {};
 
-function loadProducts(){
-  var sel=document.getElementById('product');
-  sel.innerHTML="";
+function saveProducts(){ localStorage.setItem('lywawa_products', JSON.stringify(products)); }
+
+function showProducts(){
+  var h="";
   for(var i=0;i<products.length;i++){
     var p=products[i];
-    var opt=document.createElement('option');
-    opt.value=i;
-    opt.text=p.name + " - Ksh " + p.price + " (Stock: " + p.stock + ")";
-    sel.appendChild(opt);
+    var stockText = p.stock<=5 ? "<div class='stock low'>Stock: "+p.stock+" - LOW! ⚠️</div>" : "<div class='stock'>Stock: "+p.stock+"</div>";
+    h += "<div class='pcard' onclick='addToCart("+i+")'><b>"+p.name+"</b><div class='price'>Ksh "+p.price+"</div>"+stockText+"<div style='font-size:12px;color:#999'>+ Add</div></div>";
   }
-  updateInfo(); showToday();
+  document.getElementById('products').innerHTML=h;
 }
-function updateInfo(){
-  var i=document.getElementById('product').value;
-  if(i==="" || !products[i]) return;
-  var p=products[i];
-  var el=document.getElementById('info');
-  if(p.stock<=5){
-    el.innerHTML="Price: Ksh "+p.price+" | Stock: <span class='low'>"+p.stock+" - LOW STOCK! ⚠️</span>";
-  } else {
-    el.innerHTML="Price: Ksh "+p.price+" | Stock: <span class='ok'>"+p.stock+"</span>";
-  }
-}
-function makeSale(){
-  var idx=document.getElementById('product').value;
-  var qty=parseInt(document.getElementById('qty').value);
-  var cust=document.getElementById('customer').value.trim() || "Walk-in";
-  if(idx==="" || !products[idx]){ alert("No products! Add products first"); return; }
-  if(!qty || qty<1){ alert("Enter quantity"); return; }
-  var p=products[idx];
-  if(p.stock < qty){
-    alert("Not enough stock! Only "+p.stock+" left for "+p.name);
-    return;
-  }
-  // THIS IS THE FIX: Minus stock
-  p.stock = Number(p.stock) - qty;
-  localStorage.setItem('lywawa_products', JSON.stringify(products));
 
-  var total = Number(p.price)*qty;
-  orders.push({product:p.name, price:p.price, qty:qty, total:total, customer:cust, date:new Date().toLocaleString()});
+function addToCart(i){
+  var p=products[i];
+  if(p.stock<=0){ alert(p.name+" is OUT OF STOCK!"); return; }
+  var current = cart[i] || 0;
+  if(current >= p.stock){ alert("Only "+p.stock+" left for "+p.name); return; }
+  cart[i]=current+1;
+  showCart();
+}
+
+function showCart(){
+  var h=""; var total=0; var has=false;
+  for(var i in cart){
+    has=true;
+    var p=products[i]; var qty=cart[i]; var sub=p.price*qty; total+=sub;
+    h+="<div class='row'><span>"+p.name+" x "+qty+"</span><span>Ksh "+sub+" <span onclick='removeOne("+i+")' style='color:red;cursor:pointer'> [x]</span></span></div>";
+  }
+  if(!has) h="<p>No items yet</p>";
+  document.getElementById('cart').innerHTML=h;
+  document.getElementById('total').innerText="Ksh "+total;
+}
+
+function removeOne(i){ delete cart[i]; showCart(); }
+function clearCart(){ cart={}; showCart(); document.getElementById('msg').innerText=""; }
+
+function completeSale(){
+  var total=0; var has=false;
+  for(var i in cart){ has=true; total+=products[i].price*cart[i]; }
+  if(!has){ alert("Cart is empty! Click + Add first"); return; }
+  var payment=document.getElementById('payment').value;
+
+  // FIX: Minus stock for every item in cart
+  for(var i in cart){
+    var qty=cart[i];
+    products[i].stock = Number(products[i].stock) - qty;
+    orders.push({product:products[i].name, price:products[i].price, cost:products[i].cost||0, qty:qty, total:products[i].price*qty, payment:payment, date:new Date().toLocaleString()});
+  }
+  saveProducts();
   localStorage.setItem('lywawa_orders', JSON.stringify(orders));
 
-  document.getElementById('msg').innerText="✅ Sold "+qty+" x "+p.name+" = Ksh "+total+" | Remaining Stock: "+p.stock;
+  document.getElementById('msg').innerText="✅ Sale Complete! Ksh "+total+" - Stock Updated!";
   document.getElementById('msg').style.color="green";
-  loadProducts();
+  cart={}; showCart(); showProducts();
 }
-function showToday(){
-  var h="";
-  var total=0;
-  for(var i=0;i<orders.length;i++){
-    h+="<tr><td>"+orders[i].product+"</td><td>"+orders[i].qty+"</td><td>Ksh "+orders[i].total+"</td></tr>";
-    total+=Number(orders[i].total);
-  }
-  if(!h) h="<tr><td colspan='3' style='text-align:center'>No sales yet today</td></tr>";
-  else h+="<tr><td colspan='2'><b>Total</b></td><td><b>Ksh "+total+"</b></td></tr>";
-  document.getElementById('today').innerHTML=h;
-}
-loadProducts();
+
+showProducts(); showCart();
 </script>
 </body>
 </html>
