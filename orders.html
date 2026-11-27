@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Orders - Lywawa Bakery</title>
+<style>
+body{font-family:Arial;background:#FFF3E0;margin:0}
+.top{background:#BF360C;color:white;padding:15px 20px;display:flex;justify-content:space-between}
+.top a{color:white;text-decoration:none}
+.wrap{padding:20px}
+input,select{width:100%;padding:10px;margin:5px 0;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}
+button{width:100%;padding:12px;background:#BF360C;color:white;border:none;border-radius:8px;font-size:16px}
+.card{background:white;padding:15px;border-radius:12px;margin-top:12px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.card b{font-size:16px}
+.badge{padding:4px 10px;border-radius:20px;font-size:12px;color:white}
+.pending{background:#FF9800}
+.ready{background:#2E7D32}
+.done{background:#999}
+.small{color:#666;font-size:13px}
+.row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.row button{width:auto;padding:6px 12px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="top"><b>🧾 Customer Orders</b><a href="dashboard.html">Back</a></div>
+<div class="wrap">
+<input id="cname" placeholder="Customer Name e.g. Mary">
+<input id="item" placeholder="Order e.g. 2kg Chocolate Cake">
+<input id="phone" placeholder="Phone e.g. 0712...">
+<select id="date"><option>Today</option><option>Tomorrow</option><option>Next Week</option></select>
+<button onclick="addOrder()">Add Order</button>
+<div id="list"></div>
+</div>
+<script>
+let orders=[
+{name:"Mary Wanjiku",item:"2kg Chocolate Cake",phone:"0712345678",date:"Today",status:"Pending"},
+{name:"John Otieno",item:"50 Mandazi for Party",phone:"0722111222",date:"Tomorrow",status:"Ready"}
+];
+function show(){
+  document.getElementById('list').innerHTML=orders.map((o,i)=>{
+    let cls=o.status=="Pending"?"pending":o.status=="Ready"?"ready":"done";
+    return `<div class="card">
+      <div class="row"><b>${o.name}</b><span class="badge ${cls}">${o.status}</span></div>
+      <div class="small">${o.item} • ${o.date} • ${o.phone}</div>
+      <div class="row">
+        <button onclick="change(${i})">Change Status</button>
+        <button style="background:#eee;color:#333" onclick="del(${i})">Delete</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+function addOrder(){
+  let n=document.getElementById('cname').value;
+  let it=document.getElementById('item').value;
+  let ph=document.getElementById('phone').value;
+  let d=document.getElementById('date').value;
+  if(n && it){ orders.unshift({name:n,item:it,phone:ph,date:d,status:"Pending"}); show();
+    document.getElementById('cname').value="";document.getElementById('item').value="";document.getElementById('phone').value="";
+  }
+}
+function change(i){
+  if(orders[i].status=="Pending") orders[i].status="Ready";
+  else if(orders[i].status=="Ready") orders[i].status="Done";
+  else orders[i].status="Pending";
+  show();
+}
+function del(i){ orders.splice(i,1); show(); }
+show();
+</script>
+</body>
+</html>
